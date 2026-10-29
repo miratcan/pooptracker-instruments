@@ -1,0 +1,18 @@
+# Every push and pull request: each instrument is checked with PoopTracker's own format code (tools/check.mjs).
+name: check
+on:
+  push:
+  pull_request:
+jobs:
+  instruments:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: miratcan/pooptracker
+          path: .pooptracker
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/check.mjs .pooptracker
