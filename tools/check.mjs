@@ -16,6 +16,7 @@ const load = f => import(pathToFileURL(path.join(PT, f)).href);
 const { default: PTFormat } = await load('src/ptformat.js');
 const { indexMp4, reader } = await load('src/mp4cut.js');
 const { u32, fourcc } = await load('src/mp4.js');
+const { focusAt } = await load('src/core/instrument.js');
 
 const MAX_BYTES = 5 * 1024 * 1024; // a few seconds of video; jsDelivr serves files up to 20 MB
 const MAX_REGION = 8;              // PoopTracker's MAX_SAMPLE_SEC
@@ -28,6 +29,8 @@ const SKIP = new Set(['.git', '.github', '.pooptracker', 'tools', 'node_modules'
 
 let errors = 0, warnings = 0;
 const listed = [];
+// where the picture looks at the hit (x, y 0–1 across the frame): the library's preview crops around it, as a tile does
+const at = f => [+f.x.toFixed(3), +f.y.toFixed(3)];
 const error = (file, msg) => { errors++; console.log(`::error file=${file}::${file}: ${msg}`); };
 const warn = (file, msg) => { warnings++; console.log(`::warning file=${file}::${file}: ${msg}`); };
 
@@ -69,7 +72,7 @@ async function check(rel) {
   if (I.end - I.start > MAX_REGION + 0.001) error(rel, `the region is ${(I.end - I.start).toFixed(3)} s; at most ${MAX_REGION} s`);
   if (I.end > dur + 0.05) error(rel, `the region ends at ${I.end.toFixed(3)} s, after the video (${dur.toFixed(3)} s)`);
   if (dur > I.end + MAX_LONGER) error(rel, `the video is ${dur.toFixed(3)} s but its region ends at ${I.end.toFixed(3)} s: Trim it in PoopTracker`);
-  if (errors === before) listed.push({ path: parts.join('/'), name: I.name, length: +(I.end - I.start).toFixed(3), bytes: b.length, ...(I.tags.length ? { tags: I.tags } : {}), ...(I.source ? { source: I.source } : {}) });
+  if (errors === before) listed.push({ path: parts.join('/'), name: I.name, length: +(I.end - I.start).toFixed(3), bytes: b.length, ...(I.tags.length ? { tags: I.tags } : {}), ...(I.focus.length ? { focus: at(focusAt(I, I.hit)) } : {}), ...(I.source ? { source: I.source } : {}) });
 }
 
 const files = [...walk(ROOT)];

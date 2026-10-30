@@ -48,7 +48,7 @@ node tools/check.mjs ../pooptracker
 
 ## index.json
 
-The list PoopTracker loads the collection from: each instrument's path, name, length, size, tags and source, read from its
+The list PoopTracker loads the collection from: each instrument's path, name, length, size, tags, focus and source, read from its
 own metadata. Don't edit it: on `main` the workflow writes it after every merge (`node tools/check.mjs --index` does
 the same by hand).
 

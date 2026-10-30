@@ -17,13 +17,21 @@
    "path": "lyrics/en/keep-goin-on.mp4",
    "name": "keep-goin-on",
    "length": 1.038,
-   "bytes": 4581311
+   "bytes": 4581311,
+   "focus": [
+    0.415,
+    0.302
+   ]
   },
   {
    "path": "lyrics/tr/bir-seyler-calin-bakalim.mp4",
    "name": "Bir Seyler Calin",
    "length": 2.053,
-   "bytes": 174513
+   "bytes": 174513,
+   "focus": [
+    0.268,
+    0.532
+   ]
   },
   {
    "path": "lyrics/tr/cikar-goster.mp4",
@@ -41,7 +49,11 @@
    "path": "lyrics/tr/taksim.mp4",
    "name": "Taksim",
    "length": 0.612,
-   "bytes": 1714541
+   "bytes": 1714541,
+   "focus": [
+    0.264,
+    0.484
+   ]
   },
   {
    "path": "lyrics/tr/yok.mp4",
