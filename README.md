@@ -2,7 +2,8 @@
 
 Ready-to-play instruments for [PoopTracker](https://github.com/miratcan/pooptracker), the tracker whose samples are
 videos. Every file here is one instrument: a short video with its settings (region, hit point, base note, envelope,
-where it comes from) inside its own metadata. Drop one on PoopTracker and it arrives tuned and ready.
+where it comes from) inside its own metadata. In PoopTracker, **Lib.** under the instrument list lists them all: find
+one, hear it, add it. Or drop a file on PoopTracker: it arrives tuned and ready.
 
 ## Layout
 
