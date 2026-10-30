@@ -1,14 +1,17 @@
 // Checks every instrument in the collection: its name and place, that it is an MP4 with H.264 and AAC, and that the
 // PoopTracker instrument in its metadata is valid; an instrument that doesn't say where its video comes from is warned about. The rules of the instrument line
 // are PoopTracker's own (its src/ptformat.js), never copied here.
-//   node tools/check.mjs [path to a PoopTracker checkout, default ../pooptracker]
+//   node tools/check.mjs [path to a PoopTracker checkout, default ../pooptracker] [--index]
+// --index also writes index.json, the list PoopTracker loads the collection from: every valid instrument, read from its
+// own metadata (nobody writes it by hand; the workflow writes it on main).
 // Errors and warnings are printed as GitHub annotations; the exit code is 1 when there is an error.
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PT = path.resolve(process.argv[2] ?? path.join(ROOT, '../pooptracker'));
+const args = process.argv.slice(2), INDEX = args.includes('--index');
+const PT = path.resolve(args.find(a => !a.startsWith('--')) ?? path.join(ROOT, '../pooptracker'));
 const load = f => import(pathToFileURL(path.join(PT, f)).href);
 const { default: PTFormat } = await load('src/ptformat.js');
 const { indexMp4, reader } = await load('src/mp4cut.js');
@@ -18,10 +21,13 @@ const MAX_BYTES = 5 * 1024 * 1024; // a few seconds of video; jsDelivr serves fi
 const MAX_REGION = 8;              // PoopTracker's MAX_SAMPLE_SEC
 const MAX_LONGER = 1;              // seconds the video may run past its region: more means it wasn't trimmed
 const NAME = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+// the name the workbench gives a piece: the video's file name and where the piece starts ('All Evans S 0:04')
+const BENCH_NAME = /\s\d{1,2}(:\d{2}){1,2}$/;
 // not instruments: the repository's own files
 const SKIP = new Set(['.git', '.github', '.pooptracker', 'tools', 'node_modules', 'README.md', 'LICENSE', '.gitignore', 'index.json']);
 
 let errors = 0, warnings = 0;
+const listed = [];
 const error = (file, msg) => { errors++; console.log(`::error file=${file}::${file}: ${msg}`); };
 const warn = (file, msg) => { warnings++; console.log(`::warning file=${file}::${file}: ${msg}`); };
 
@@ -34,6 +40,7 @@ function* walk(dir) {
 }
 
 async function check(rel) {
+  const before = errors;
   const parts = rel.split(path.sep), ext = path.extname(rel), stem = path.basename(rel, ext);
   if (parts.length < 2) return error(rel, 'an instrument goes in a folder for its kind of sound (snare/, lyrics/tr/…)');
   if (ext !== '.mp4') return error(rel, `only .mp4 files belong here (found '${ext || 'no extension'}')`);
@@ -57,13 +64,19 @@ async function check(rel) {
   let I;
   try { I = PTFormat.parse(line); } catch (e) { return error(rel, e.message); }
   if ('video' in I) error(rel, "the instrument line can't have a 'video' field");
+  if (BENCH_NAME.test(I.name)) warn(rel, `'${I.name}' is the workbench's name for the piece: give it one that says what it is and Save again`);
   if (!I.source) warn(rel, 'no source: fill in Source in PoopTracker (a link, or e.g. "own recording") and Save again');
   if (I.end - I.start > MAX_REGION + 0.001) error(rel, `the region is ${(I.end - I.start).toFixed(3)} s; at most ${MAX_REGION} s`);
   if (I.end > dur + 0.05) error(rel, `the region ends at ${I.end.toFixed(3)} s, after the video (${dur.toFixed(3)} s)`);
   if (dur > I.end + MAX_LONGER) error(rel, `the video is ${dur.toFixed(3)} s but its region ends at ${I.end.toFixed(3)} s: Trim it in PoopTracker`);
+  if (errors === before) listed.push({ path: parts.join('/'), name: I.name, length: +(I.end - I.start).toFixed(3), bytes: b.length, ...(I.tags.length ? { tags: I.tags } : {}), ...(I.source ? { source: I.source } : {}) });
 }
 
 const files = [...walk(ROOT)];
 for (const f of files) await check(f);
 console.log(`${files.length} files, ${errors} error${errors === 1 ? '' : 's'}, ${warnings} warning${warnings === 1 ? '' : 's'}`);
+if (INDEX) {
+  fs.writeFileSync(path.join(ROOT, 'index.json'), JSON.stringify({ format: 1, instruments: listed }, null, 1) + '\n');
+  console.log(`index.json: ${listed.length} instruments`);
+}
 process.exitCode = errors ? 1 : 0;

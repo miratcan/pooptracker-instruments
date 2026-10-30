@@ -1,0 +1,72 @@
+{
+ "format": 1,
+ "instruments": [
+  {
+   "path": "cowbell/1.mp4",
+   "name": "CowBell",
+   "length": 0.396,
+   "bytes": 377613
+  },
+  {
+   "path": "lyrics/en/keep-goin-on.mp4",
+   "name": "keep-goin-on",
+   "length": 1.038,
+   "bytes": 4581311
+  },
+  {
+   "path": "lyrics/tr/bir-seyler-calin-bakalim.mp4",
+   "name": "Bir Seyler Calin",
+   "length": 2.053,
+   "bytes": 174513
+  },
+  {
+   "path": "lyrics/tr/cikar-goster.mp4",
+   "name": "cikar-goster",
+   "length": 1.053,
+   "bytes": 338149
+  },
+  {
+   "path": "lyrics/tr/nasil.mp4",
+   "name": "nasil?",
+   "length": 0.752,
+   "bytes": 621523
+  },
+  {
+   "path": "lyrics/tr/taksim.mp4",
+   "name": "Taksim",
+   "length": 0.612,
+   "bytes": 1714541
+  },
+  {
+   "path": "lyrics/tr/yok.mp4",
+   "name": "Yok",
+   "length": 0.538,
+   "bytes": 232264,
+   "source": "Şekerpare movie (1983)"
+  },
+  {
+   "path": "slap/1.mp4",
+   "name": "Slap",
+   "length": 1.004,
+   "bytes": 520324
+  },
+  {
+   "path": "snare/1.mp4",
+   "name": "Snare 1",
+   "length": 0.422,
+   "bytes": 632645
+  },
+  {
+   "path": "snare/2.mp4",
+   "name": "Snare 2",
+   "length": 0.476,
+   "bytes": 753529
+  },
+  {
+   "path": "snare/3.mp4",
+   "name": "Snare 3",
+   "length": 0.367,
+   "bytes": 345925
+  }
+ ]
+}
